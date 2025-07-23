@@ -1,0 +1,6 @@
+v 3
+d inputcorrection: Generate enumerator bias reports
+d distribution-date: 2024-07-04
+f src/inputcorrection.ado
+f src/inputcorrection.sthlp
+f examples/example.do
