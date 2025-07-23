@@ -1,11 +1,10 @@
-*! inputcorrection v1.0 - Program to apply corrections from Excel to Stata dataset
+*! inputcorrection v1.1 - Improved program with better error handling
 *! Author: Your Name
 *! Date: 2023-MM-DD
-*! GitHub: https://github.com/yourusername/inputcorrection
 
 program define inputcorrection
     version 16
-    syntax using/, key(varname) varnames(string) correction(string) [sheet(string)]
+    syntax using/, key(string) varnames(string) correction(string) [sheet(string)]
     
     // Preserve original data
     preserve
@@ -19,11 +18,20 @@ program define inputcorrection
             import excel "`using'", sheet("`sheet'") firstrow clear
         }
         
+        // Display the variables in the correction file for debugging
+        di as text _n "Variables in correction file:"
+        describe, short
+        
         // Check if required columns exist
-        capture confirm variable `key' `varnames' `correction'
-        if _rc {
-            di as error "One or more specified columns (`key', `varnames', `correction') not found in the Excel file"
-            exit 111
+        foreach col in `key' `varnames' `correction' {
+            capture confirm variable `col'
+            if _rc {
+                di as error "Column '`col'' not found in the Excel file"
+                di as error "Available columns: " _c
+                qui ds
+                di as result r(varlist)
+                exit 111
+            }
         }
         
         // Keep only necessary columns and rename for merging
@@ -50,7 +58,7 @@ program define inputcorrection
             // Check if variable exists in dataset
             capture confirm variable `var'
             if _rc {
-                di as error "Variable `var' from correction file not found in dataset"
+                di as error "Variable '`var'' from correction file not found in dataset"
                 continue
             }
             
@@ -61,12 +69,13 @@ program define inputcorrection
             if substr("`vartype'", 1, 3) == "str" {
                 // String variable
                 replace `var' = corrected_value if variable_name == "`var'" & !missing(corrected_value)
+                di as text "Applied string corrections for: " as result "`var'"
             }
             else {
                 // Numeric variable - attempt destring if needed
                 capture confirm numeric variable `var'
                 if _rc {
-                    di as error "Variable `var' is not numeric but correction file contains numeric corrections"
+                    di as error "Variable '`var'' is not numeric but correction file contains numeric corrections"
                     continue
                 }
                 
@@ -75,9 +84,8 @@ program define inputcorrection
                 gen `numval' = real(corrected_value) if variable_name == "`var'" & !missing(corrected_value)
                 replace `var' = `numval' if variable_name == "`var'" & !missing(`numval')
                 drop `numval'
+                di as text "Applied numeric corrections for: " as result "`var'"
             }
-            
-            di as text "Applied corrections for variable: " as result "`var'"
         }
         
         // Clean up
