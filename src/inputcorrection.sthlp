@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0 [Date] [Author]}
+{* *! version 2.0.0 [Date] [Author]}
 {hline}
 help for {hi:codebookgen}
 {hline}
