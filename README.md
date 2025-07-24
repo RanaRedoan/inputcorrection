@@ -1,23 +1,39 @@
-# optcounts
+# 📦 inputcorrection
 
-This repository contains a Stata program, `optcounts`, designed to analyze survey data by counting user-specified special value selections per enumerator.
+**`inputcorrection`** is a lightweight, automated Stata program that updates your dataset using corrected or translated text stored in an Excel file. It’s ideal for fieldwork or surveys where open-ended text responses are later translated or cleaned (e.g., Bangla written in English letters translated into formal English).
 
-## Files
+---
 
-- `optcounts.ado`: The Stata program file for counting special values (e.g., -99, 99, -999) across all variables per enumerator.
-- `optcounts.sthlp`: The help file for Stata documentation.
-- `example.do`: A detailed example script demonstrating usage with sample data.
-- `readme.md`: This file, providing an overview of the repository.
+## 🚀 Installation
 
-## Installation
-
-1. Clone or download this repository to your local machine.
-2. Place the `optcounts.ado` file in your Stata ado path (run `sysdir` in Stata to find it, e.g., `~/ado/personal/`).
-3. Install the help file by placing `optcounts.sthlp` in the same directory or your Stata help path.
-
-## Usage
-
-Run the following command in Stata after loading your dataset:
+To install directly from GitHub:
 
 ```stata
-optcounts -99 99 -999 -98, enum(interviewr_name)
+net install inputcorrection, from("https://raw.githubusercontent.com/yourusername/inputcorrection/main/")
+**
+## Syntax**
+
+inputcorrection using filename.xlsx, idvar(varname) varnamecol(varname) correction(varname)
+
+**# Example**
+use example_data.dta, clear
+
+inputcorrection using "corrections.xlsx", ///
+    idvar(id) ///
+    varnamecol(variable) ///
+    correction(translated)
+
+browse
+save example_data_corrected.dta, replace
+
+
+**# Example Correction Sheet (corrections.xlsx)**
+
+id     variable         original                       translated
+---------------------------------------------------------------------------
+1001   question1        apnar nam ki?                  What is your name?
+1001   question2        apnar boyosh koto?             How old are you?
+1002   question1        apni kothay thaken?            Where do you live?
+1003   question3        kichu bolte chan?              Would you like to say something?
+
+
