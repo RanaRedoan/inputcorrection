@@ -59,24 +59,17 @@ The variables listed in the Excel file under {opt varnamecol()} must already exi
 
 {title:Example}
 
-{phang2}{cmd:. use survey_data.dta, clear}
-{phang2}{cmd:. inputcorrection using "corrections.xlsx", idvar(id) varnamecol(variable) correction(translated)}
-
+{phang}{cmd: inputcorrection using "corrections.xlsx", idvar(key) varnamecol(variable) correction(translated)}{p_end}
 {pstd}
 This example loads your main dataset, then applies corrections found in {cmd:corrections.xlsx}. 
 Each corrected value replaces the value in the matching variable and observation based on {cmd:id} and {cmd:variable}.
 
 {title:Author}
 
-{pstd}
-Developed by {bf:Md. Redoan Hossain Bhuiyan}  
-Email: {browse "mailto:redoanhossain360@gmail.com":redoanhossain360@gmail.com}  
-GitHub: {browse "https://github.com/ranaredoan/inputcorrection":https://github.com/ranaredoan/inputcorrection}
-
-{title:Version}
-
-{pstd}
-1.0 — July 24, 2025
+{p 4 4 2}
+Md. Redoan Hossain Bhuiyan{p_end}
+{p 4 4 2}
+Email: redoanhossain630@gmail.com{p_end}
 
 {title:License}
 
