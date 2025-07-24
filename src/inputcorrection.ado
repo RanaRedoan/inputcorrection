@@ -2,16 +2,16 @@ program define inputcorrection
     version 14.0
     syntax using/, idvar(string) varnamecol(string) correction(string)
 
-    // Save the current dataset name and location
+    // Save the current dataset temporarily
     tempfile dataset
     save `dataset', replace
 
-    // Load corrections from Excel
+    // Import correction Excel
     tempfile corrections
     import excel `using', firstrow clear
     save `corrections', replace
 
-    // Check required columns exist
+    // Verify required columns exist
     use `corrections', clear
     foreach col in `idvar' `varnamecol' `correction' {
         capture confirm variable `col'
@@ -21,10 +21,10 @@ program define inputcorrection
         }
     }
 
-    // Keep necessary columns only
+    // Keep only required columns
     keep `idvar' `varnamecol' `correction'
 
-    // Get unique list of variables to correct
+    // Get list of variables to update
     levelsof `varnamecol', local(varlist_clean)
 
     // Loop over each variable
@@ -35,23 +35,23 @@ program define inputcorrection
         use `corrections', clear
         keep if `varnamecol' == "`var'"
         drop `varnamecol'
-        rename `correction' corrected_`var'
+        rename `correction' corrected
         save `tmp_`var'', replace
 
-        // Merge with main dataset and apply corrections
+        // Merge and apply corrections
         use `dataset', clear
         capture confirm variable `var'
         if _rc {
-            di as error "Warning: Variable `var' not found in the dataset. Skipping."
+            di as error "Warning: Variable `var' not found in dataset. Skipping."
             continue
         }
 
         merge 1:1 `idvar' using `tmp_`var'', nogenerate
-        replace `var' = corrected_`var' if !missing(corrected_`var')
-        drop corrected_`var'
+        replace `var' = corrected if !missing(corrected)
+        drop corrected
         save `dataset', replace
     }
 
-    // Restore the updated dataset
+    // Restore updated dataset
     use `dataset', clear
 end
