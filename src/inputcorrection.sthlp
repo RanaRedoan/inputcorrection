@@ -66,16 +66,16 @@ The variables listed in the Excel file under {opt varnamecol()} must already exi
 This example loads your main dataset, then applies corrections found in {cmd:corrections.xlsx}. 
 Each corrected value replaces the value in the matching variable and observation based on {cmd:id} and {cmd:variable}.
 
-
 {pstd}
-{bf:Example correction sheet, You can create it easily with {cmd:inputcorrection} (long format):}
+{title:Example correction sheet}
 
-{cmd}
+{bf: You can create it easily with {cmd:inputcorrection} or manually prepare this but make sure you have columns for unique ID, variable names, and corrections or translation(long format):}
+   
     id     variable         original                       translated
     -------------------------------------------------------------------------------
     1001   var1_other       Shukor                         pig
     1001   var1_other       Ghora                          Horse
-    1002   comments         Sob kichu thik chilo           Everything was file
+    1002   comments         Sob kichu thik chilo           Everything was fine
     1003   comments         Oni bari chole jabe            He will move to his house
 {txt}
 
