@@ -59,7 +59,9 @@ The variables listed in the Excel file under {opt varnamecol()} must already exi
 
 {title:Example}
 
+{phang}{cmd: use "Dataset.dta, clear}{p_end}
 {phang}{cmd: inputcorrection using "corrections.xlsx", idvar(key) varnamecol(variable) correction(translated)}{p_end}
+
 {pstd}
 This example loads your main dataset, then applies corrections found in {cmd:corrections.xlsx}. 
 Each corrected value replaces the value in the matching variable and observation based on {cmd:id} and {cmd:variable}.
