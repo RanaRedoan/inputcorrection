@@ -1,52 +1,57 @@
 program define inputcorrection
-    // Get parameters: 'varnamecol' is now a string, not a list
+    version 14.0
     syntax using/, idvar(string) varnamecol(string) correction(string)
 
-    // Save the working dataset
-    preserve
+    // Save the current dataset name and location
+    tempfile dataset
+    save `dataset', replace
 
-    // Import the Excel correction file
+    // Load corrections from Excel
     tempfile corrections
     import excel `using', firstrow clear
     save `corrections', replace
 
-    // Check required columns exist in the correction file
+    // Check required columns exist
     use `corrections', clear
-    foreach v in `idvar' `varnamecol' `correction' {
-        capture confirm variable `v'
+    foreach col in `idvar' `varnamecol' `correction' {
+        capture confirm variable `col'
         if _rc {
-            display as error "Error: Required column '`v'' not found in the correction file."
+            di as error "Error: Required column '`col'' not found in the correction file."
             exit 198
         }
     }
 
-    // Keep only necessary columns
+    // Keep necessary columns only
     keep `idvar' `varnamecol' `correction'
 
-    // List of unique variables to correct
+    // Get unique list of variables to correct
     levelsof `varnamecol', local(varlist_clean)
 
-    // Loop through each variable found in the correction file
+    // Loop over each variable
     foreach var of local varlist_clean {
         tempfile tmp_`var'
-        preserve
 
+        // Extract corrections for this variable
+        use `corrections', clear
         keep if `varnamecol' == "`var'"
         drop `varnamecol'
         rename `correction' corrected_`var'
         save `tmp_`var'', replace
 
-        restore, preserve
+        // Merge with main dataset and apply corrections
+        use `dataset', clear
         capture confirm variable `var'
         if _rc {
-            display as error "Warning: Variable `var' not found in the dataset. Skipping."
+            di as error "Warning: Variable `var' not found in the dataset. Skipping."
             continue
         }
 
         merge 1:1 `idvar' using `tmp_`var'', nogenerate
         replace `var' = corrected_`var' if !missing(corrected_`var')
         drop corrected_`var'
+        save `dataset', replace
     }
 
-    restore
+    // Restore the updated dataset
+    use `dataset', clear
 end
