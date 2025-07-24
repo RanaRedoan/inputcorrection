@@ -69,6 +69,7 @@ Each corrected value replaces the value in the matching variable and observation
 {pstd}
 {title:Example correction sheet}
 
+{pstd}
 {bf: You can create it easily with {cmd:inputcorrection} or manually prepare this but make sure you have columns for unique ID, variable names, and corrections or translation(long format):}
    
     id     variable         original                       translated
