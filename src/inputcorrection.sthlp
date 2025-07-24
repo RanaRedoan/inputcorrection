@@ -75,7 +75,7 @@ Each corrected value replaces the value in the matching variable and observation
     id     variable         original                       translated
     -------------------------------------------------------------------------------
     1001   var1_other       Shukor                         pig
-    1001   var1_other       Ghora                          Horse
+    1001   var2_other       Dhan                           Paddy
     1002   comments         Sob kichu thik chilo           Everything was fine
     1003   comments         Oni bari chole jabe            He will move to his house
 {txt}
