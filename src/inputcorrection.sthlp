@@ -1,7 +1,7 @@
 {smcl}
 {* *! version 1.0 24 Jul 2025}{...}
 {title:Title}
-
+2
 {hi:inputcorrection} {hline 2} Apply text corrections or translations from Excel to a Stata dataset
 
 {title:Syntax}
