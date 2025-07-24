@@ -1,84 +1,52 @@
-*! inputcorrection v1.3 - Fixed merge issue
 program define inputcorrection
-    version 16
-    syntax using/, key(string) varnames(string) correction(string) [sheet(string) debug]
-    
-    if "`debug'" != "" {
-        di as text _n"=== DEBUG MODE ==="
-        set trace on
-    }
-    
+    // Get parameters: 'varnamecol' is now a string, not a list
+    syntax using/, idvar(string) varnamecol(string) correction(string)
+
+    // Save the working dataset
     preserve
-    
-    // 1. Import correction file
-    qui {
-        if "`sheet'" == "" {
-            import excel "`using'", firstrow clear
+
+    // Import the Excel correction file
+    tempfile corrections
+    import excel `using', firstrow clear
+    save `corrections', replace
+
+    // Check required columns exist in the correction file
+    use `corrections', clear
+    foreach v in `idvar' `varnamecol' `correction' {
+        capture confirm variable `v'
+        if _rc {
+            display as error "Error: Required column '`v'' not found in the correction file."
+            exit 198
         }
-        else {
-            import excel "`using'", sheet("`sheet'") firstrow clear
-        }
-        
-        // Verify columns exist
-        foreach col in `key' `varnames' `correction' {
-            capture confirm variable `col'
-            if _rc {
-                di as error "Column '`col'' not found in Excel file"
-                di as error "Available columns: " _c
-                qui ds
-                di as result r(varlist)
-                exit 111
-            }
-        }
-        
-        // Keep and rename without using temporary names
-        keep `key' `varnames' `correction'
-        rename `key' merge_key
-        rename `varnames' var_to_correct
-        rename `correction' corrected_val
-        
-        tempfile corrections
-        save `corrections'
-        
-        // 2. Merge with original data
+    }
+
+    // Keep only necessary columns
+    keep `idvar' `varnamecol' `correction'
+
+    // List of unique variables to correct
+    levelsof `varnamecol', local(varlist_clean)
+
+    // Loop through each variable found in the correction file
+    foreach var of local varlist_clean {
+        tempfile tmp_`var'
+        preserve
+
+        keep if `varnamecol' == "`var'"
+        drop `varnamecol'
+        rename `correction' corrected_`var'
+        save `tmp_`var'', replace
+
         restore, preserve
-        gen merge_key = `key'
-        
-        merge m:1 merge_key var_to_correct using `corrections', ///
-            keep(master match) nogen
-        
-        // 3. Apply corrections
-        levelsof var_to_correct if !missing(corrected_val), local(vars_to_correct)
-        
-        foreach var in `vars_to_correct' {
-            capture confirm variable `var'
-            if _rc {
-                di as error "Variable '`var'' not found in dataset"
-                continue
-            }
-            
-            local vartype: type `var'
-            
-            if substr("`vartype'", 1, 3) == "str" {
-                replace `var' = corrected_val if var_to_correct == "`var'" & !missing(corrected_val)
-                di "Corrected string variable: `var'"
-            }
-            else {
-                tempvar numval
-                gen `numval' = real(corrected_val) if var_to_correct == "`var'" & !missing(corrected_val)
-                replace `var' = `numval' if var_to_correct == "`var'" & !missing(`numval')
-                drop `numval'
-                di "Corrected numeric variable: `var'"
-            }
+        capture confirm variable `var'
+        if _rc {
+            display as error "Warning: Variable `var' not found in the dataset. Skipping."
+            continue
         }
-        
-        drop merge_key var_to_correct corrected_val
+
+        merge 1:1 `idvar' using `tmp_`var'', nogenerate
+        replace `var' = corrected_`var' if !missing(corrected_`var')
+        drop corrected_`var'
     }
-    
-    restore, not
-    
-    if "`debug'" != "" {
-        set trace off
-        di as text _n"=== DEBUG COMPLETE ==="
-    }
+
+    restore
 end
