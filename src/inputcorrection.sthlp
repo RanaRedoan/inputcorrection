@@ -1,115 +1,82 @@
 {smcl}
-{* *! version 2.0.0 [Date] [Author]}
-{hline}
-help for {hi:importcorrection}
-{hline}
-
+{* *! version 1.0 24 Jul 2025}{...}
 {title:Title}
 
-{p2colset 5 18 20 2}{...}
-{p2col :{cmd:codebookgen} {hline 2}}Enhanced codebook/documentation generator{p_end}
-{p2colreset}{...}
+{hi:inputcorrection} {hline 2} Apply text corrections or translations from Excel to a Stata dataset
 
 {title:Syntax}
 
-{p 8 17 2}
-{cmd:codebookgen} 
-[{varlist}] 
-{cmd:using/}
-[{cmd:,} 
-{cmd:replace}
-{cmd:modify}
-{cmd:sheet(}{it:string}{cmd:)}
-{cmd:addvars(}{it:string}{cmd:)}
-{cmd:stats(}{it:string}{cmd:)}
-{cmd:format}
-{cmd:excelx}
-]
+{p 8 15 2}
+{cmd:inputcorrection} {cmd:using} {it:filename.xlsx}, {opt idvar(varname)} {opt varnamecol(varname)} {opt correction(varname)}
 
 {title:Description}
 
 {pstd}
-{cmd:codebookgen} creates comprehensive codebooks in Excel format with extended metadata capabilities.
-It automatically extracts variable labels, value labels, characteristics, and missing value statistics,
-producing professional documentation for your datasets.
+{cmd:inputcorrection} applies corrected or translated text values from an Excel file to your current Stata dataset. 
+It is especially useful for updating open-ended or text-based survey responses using post-fieldwork edits made by analysts or translators.
+
+{pstd}
+The correction file must be in {bf:long format}, where each row contains an {bf:ID}, the {bf:variable name to update}, and the {bf:corrected value}.
 
 {title:Options}
 
 {phang}
-{opt using} specifies the output Excel filename (required).
+{opt using filename.xlsx} 
+    Specifies the Excel file containing the corrections or translations. The file must include columns for ID, variable name, and corrected value.
 
 {phang}
-{opt replace} overwrites an existing Excel file.
+{opt idvar(varname)} 
+    Specifies the name of the unique identifier column, which must exist in both the dataset and the Excel file.
 
 {phang}
-{opt modify} appends to an existing Excel file (cannot combine with {opt replace}).
+{opt varnamecol(varname)} 
+    Specifies the name of the column in the Excel file that contains the names of variables to update.
 
 {phang}
-{opt sheet(name)} specifies the worksheet name (default is "Codebook").
+{opt correction(varname)} 
+    Specifies the name of the column in the Excel file that contains the corrected or translated text.
 
-{phang}
-{opt addvars(string)} lists additional characteristics to include as columns 
-(e.g., "source validation_notes").
-
-{phang}
-{opt stats(string)} specifies additional statistics to include (planned feature).
-
-{phang}
-{opt format} applies automatic formatting (column widths, text wrapping).
-
-{phang}
-{opt excelx} forces .xlsx format (default uses Stata's default Excel format).
-
-{title:Examples}
-
-{phang2}{cmd:. sysuse auto, clear}{p_end}
-{phang2}{cmd:. codebookgen using "auto_codebook.xlsx", replace format}{p_end}
-
-{phang2}{cmd:. codebookgen price mpg using "auto_vars.xlsx", sheet(PrimaryVars) addvars(source notes) replace}{p_end}
-
-{phang2}{cmd:. char _dta[source] "Automobile data from Consumer Reports"}{p_end}
-{phang2}{cmd:. char price[notes] "Manufacturer's suggested retail price"}{p_end}
-{phang2}{cmd:. codebookgen using "auto_docs.xlsx", addvars(notes) replace}{p_end}
-
-{title:Output Structure}
+{title:Requirements}
 
 {pstd}
-The generated codebook includes these default columns:
-
-{p2colset 9 30 32 2}{...}
-{p2col :Variable}Variable name{p_end}
-{p2col :Label}Variable label{p_end}
-{p2col :Question}Text from {cmd:char [note1]}{p_end}
-{p2col :Type}Stata storage type{p_end}
-{p2col :Values}Value labels or range{p_end}
-{p2col :Missing}Count of missing values{p_end}
-{p2col :Obs}Count of non-missing values{p_end}
-{p2col :Source}Text from {cmd:char [source]}{p_end}
-{p2colreset}{...}
-
-{title:Tips}
+Your Excel file must contain at least the following columns:
+{pmore}
+- {it:idvar}: the unique identifier for each observation
+{pmore}
+- {it:varnamecol}: the name of the variable to be updated
+{pmore}
+- {it:correction}: the new text value to insert into the dataset
 
 {pstd}
-1. Use characteristics to store metadata:{p_end}
-{phang2}{cmd:. char define foreign[source] "Manufacturer reports"}{p_end}
+The variables listed in the Excel file under {opt varnamecol()} must already exist in the Stata dataset.
+
+{title:Example}
+
+{phang2}{cmd:. use survey_data.dta, clear}
+{phang2}{cmd:. inputcorrection using "corrections.xlsx", idvar(id) varnamecol(variable) correction(translated)}
 
 {pstd}
-2. For survey data, store question text:{p_end}
-{phang2}{cmd:. char define Q1[note1] "What is your age?"}{p_end}
-
-{pstd}
-3. Combine with {help label} commands for complete documentation.
+This example loads your main dataset, then applies corrections found in {it:corrections.xlsx}. Each corrected value replaces the value in the matching variable and observation based on {it:id} and {it:variable name}.
 
 {title:Author}
 
-{pstd}[Your Name]{p_end}
-{pstd}[Your Institution]{p_end}
-{pstd}Email: {browse "mailto:your.email@example.com":your.email@example.com}{p_end}
+{pstd}
+Developed by {bf:Md. Redoan Hossain Bhuiyan}  
+Email: {browse "mailto:redoanhossain630@gmail.com":redoanhossain630@gmail.com}  
+GitHub: {browse "https://github.com/ranaredoan/inputcorrection":github.com/yourusername/inputcorrection}
 
-{title:Also see}
+{title:Version}
 
-{psee}
-Manual: {help label}, {help char}, {help putexcel}
+{pstd}
+1.0 — July 24, 2025
 
-{psee}
-Online: {browse "https://www.stata.com/features/overview/codebooks/":Stata codebook overview}
+{title:License}
+
+{pstd}
+MIT License. Feel free to use, modify, and share.
+
+{title:See Also}
+
+{pstd}
+{help import excel}, {help merge}, {help replace}
+
