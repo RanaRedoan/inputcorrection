@@ -43,9 +43,11 @@ inputcorrection using "corrections.xlsx", idvar(key) varnamecol(variable) correc
 ```
 This example loads your main dataset, then applies corrections from corrections.xlsx.
 Each corrected value replaces the value in the matching variable and observation based on ID and variable name.
+
 ---
-```text
+
 **# Example Correction Sheet (corrections.xlsx)**
+```text
 id     variable         original                       translated
 ---------------------------------------------------------------------------
 1001   question1        apnar nam ki?                  What is your name?
@@ -55,7 +57,7 @@ id     variable         original                       translated
 ```
 You can create this sheet manually or using inputcorrection itself, ensuring the columns for ID, variable names, and corrections/translations are present.
 
-##🤝 Contribution
+## 🤝 Contribution
 Pull requests and suggestions are welcome!
 If you find issues or have feature requests, please open an Issue in the repository.
 
@@ -63,5 +65,6 @@ If you find issues or have feature requests, please open an Issue in the reposit
 Md. Redoan Hossain Bhuiyan
 📧 redoanhossain630@gmail.com
 
-##📌 License
+## 📌 License
 This project is licensed under the MIT License.
+
