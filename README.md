@@ -1,4 +1,4 @@
-# 📊 inputcorrection: Apply Text Corrections or Translations from Excel to a Stata Dataset
+# inputcorrection: Apply Text Corrections or Translations from Excel to a Stata Dataset
 
 `inputcorrection` is a Stata program that applies **corrected or translated text values** from an Excel file to your current dataset.  
 It is especially useful for updating open-ended or text-based survey responses based on post-fieldwork edits by analysts or translators.
@@ -67,4 +67,5 @@ Md. Redoan Hossain Bhuiyan
 
 ## 📌 License
 This project is licensed under the MIT License.
+
 
